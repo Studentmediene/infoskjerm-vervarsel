@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Værvarsel for Trondheim, fra Yr.no</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+    <header>Trondheimsværet i {{ time }}</header>
+    <main>
+        <img src="{{ symbol }}"/> {{ temperature }}
+    </main>
+    <footer>
+        Værvarsel fra Yr levert av Meteorologisk institutt og NRK
+    </footer>
+</body>
+</html>
