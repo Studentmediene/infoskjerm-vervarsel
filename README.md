@@ -40,6 +40,12 @@ Hvis du ikke allerede bruker Apache bør du heller vurdere Nginx og uWSGI.
    sudo chown -R <user>: .
    ```
 
+3. Gjør `start_server.sh` kjørbar:
+
+   ```sh
+   chmod a+x start_server.sh
+   ```
+   
 5. Sørg for at Gunicorn-serveren for infoskjerm-vervarsel starter automatisk ved oppstart:
 
    1. Kopier `infoskjerm-vervarsel.service` og lagre som `/etc/systemd/system/infoskjerm-vervarsel.service`.
@@ -52,6 +58,9 @@ Hvis du ikke allerede bruker Apache bør du heller vurdere Nginx og uWSGI.
 8. Kjør:
 
     ```sh
+    # Enable the following modules (this is the Debian way)
+    a2enmod headers
+    a2enmod proxy_http
     # If the following fails, you know you have a configuration error (but the server is still up)
     apache2ctl configtest
     # Start actually using the new configuration
@@ -77,6 +86,7 @@ Du bruker basically Apache som en proxy som gjør tilgjengelig innhold fra
 Python-serveren.
 
 ```apache
+LoadModule proxy_module "modules/mod_proxy.c"
 # Replace <port> with the port specified in infoskjerm-vervarsel.service (that is, the port infoskjerm-vervarsel actually runs at)
 # Remove the "/" part if this is placed inside a <Location> or <LocationMatch>,
 # otherwise write the path where you want to place this instead of /.
