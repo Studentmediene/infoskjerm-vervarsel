@@ -19,7 +19,7 @@ def weather():
     weather_data = get_weather_data()
     relative_time = weather_data.get_time()
     symbol = weather_data.get_symbol()
-    temperature = weather_data.get_symbol()
+    temperature = weather_data.get_temperature()
     return render_template(
         "yr.html",
         time=relative_time,
@@ -33,9 +33,8 @@ def get_weather_data():
     global _weather_data
     with _create_weather_data_instance_lock:
         weather_data, expires_at = _weather_data
-        weather_data_is_expired = current_time() > expires_at
 
-        if weather_data is None or weather_data_is_expired:
+        if weather_data is None or current_time() > expires_at:
             weather_data = WeatherData()
             weather_data.populate()
             _weather_data = (weather_data, current_time() + CACHE_TIME)
