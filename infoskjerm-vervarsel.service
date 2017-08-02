@@ -1,0 +1,14 @@
+[Unit]
+Description=Weather display for the info screen
+
+[Service]
+Type=simple
+User=infoskjerm-vervarsel
+WorkingDirectory=/srv/infoskjerm-vervarsel
+# Replace <port> with the port you want to run the server on
+Environment=PORT=<port>
+ExecStart=sh -c start_server.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

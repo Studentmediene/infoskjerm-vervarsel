@@ -33,7 +33,7 @@ Hvis du ikke allerede bruker Apache bør du heller vurdere Nginx og uWSGI.
     ```
 
 2. Følg instruksene ovenfor, og installer applikasjonen i `/srv/infoskjerm-vervarsel`,
-   og med en annen bruker enn `infoskjerm-vervarsel`. På den måten kan ikke skriptet
+   og med en _annen_ bruker enn `infoskjerm-vervarsel`. På den måten kan ikke skriptet
    endre seg selv. Du kan endre eieren i etterkant ved å kjøre:
 
    ```sh
@@ -42,10 +42,8 @@ Hvis du ikke allerede bruker Apache bør du heller vurdere Nginx og uWSGI.
 
 5. Sørg for at Gunicorn-serveren for infoskjerm-vervarsel starter automatisk ved oppstart:
 
-   1. Kopier `start_server_template.sh` til `start_server.sh` og fyll inn variablene i toppen av skriptet.
-
-   1. Kopier `systemd/infoskjerm-vervarsel.template.service` og lagre som `/etc/systemd/system/infoskjerm-vervarsel.service`.
-   2. Fyll inn manglende felter i den fila.
+   1. Kopier `infoskjerm-vervarsel.service` og lagre som `/etc/systemd/system/infoskjerm-vervarsel.service`.
+   2. Fyll inn portnummeret i den fila.
    3. Kjør `sudo systemctl enable infoskjerm-vervarsel.service`
 
 7. Kopier Apache-konfigurasjonen under og plasser den der du ønsker å gjøre
@@ -79,9 +77,23 @@ Du bruker basically Apache som en proxy som gjør tilgjengelig innhold fra
 Python-serveren.
 
 ```apache
-# Replace <port> with the port specified in start_server.sh (that is, the port infoskjerm-vervarsel actually runs at)
+# Replace <port> with the port specified in infoskjerm-vervarsel.service (that is, the port infoskjerm-vervarsel actually runs at)
 # Remove the "/" part if this is placed inside a <Location> or <LocationMatch>,
 # otherwise write the path where you want to place this instead of /.
+ProxyPass "/static/" "!"
 ProxyPass "/" "http://localhost:<port>/"
 ProxyPassReverse "/" "http://localhost:<port>/"
+
+# If this is not mounted at /, you must replace / with where the application is mounted
+<Location />
+RequestHeader set X-Script-Name /
+</Location>
+
+# Don't use proxypass for static content, instead serve them directly
+Alias /static/ /srv/infoskjerm-vervarsel/static/
+
+<Directory /srv/infoskjerm-vervarsel/static>
+Require all granted
+</Directory>
+
 ```
